@@ -1,0 +1,302 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f1e6;
+  --panel: rgba(255, 251, 245, 0.92);
+  --panel-strong: #fffdf8;
+  --border: #d8ccb8;
+  --text: #2d2418;
+  --muted: #756450;
+  --accent: #1f7a4c;
+  --accent-soft: #dff2e6;
+  --gold: #c38d2f;
+  --gain: #17824a;
+  --invested: #3e6ea8;
+  --danger: #b5523a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(195, 141, 47, 0.12), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(31, 122, 76, 0.12), transparent 28%),
+    var(--bg);
+}
+
+.app-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 36px;
+  display: grid;
+  gap: 20px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 18px 36px rgba(45, 36, 24, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.hero,
+.controls-and-summary,
+.summary-grid,
+.snapshot-grid,
+.badge-grid,
+.preset-row,
+.chart-legend,
+.race-track,
+.milestone-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.hero {
+  grid-template-columns: 1.4fr 1fr;
+  align-items: start;
+}
+
+.controls-and-summary {
+  grid-template-columns: minmax(280px, 360px) 1fr;
+}
+
+.section-heading,
+.snapshot-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.2rem, 5vw, 4.4rem);
+  line-height: 0.96;
+  max-width: 9ch;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+.hero-copy {
+  margin-top: 14px;
+  max-width: 56ch;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.snapshot-grid,
+.summary-grid,
+.badge-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.snapshot-grid article,
+.summary-grid article,
+.badge,
+.race-track,
+.milestone-panel {
+  background: var(--panel-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.snapshot-grid span,
+.summary-grid span,
+.market-snapshot span,
+.race-track span,
+.milestone-panel span,
+.controls label span,
+.badge small,
+.chart-legend {
+  color: var(--muted);
+}
+
+.snapshot-grid strong,
+.summary-grid strong,
+.race-track strong,
+.milestone-panel strong,
+.badge strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.3rem;
+}
+
+.market-snapshot strong.negative,
+.summary-grid strong.negative {
+  color: var(--danger);
+}
+
+.market-snapshot strong.positive,
+.summary-grid strong.positive {
+  color: var(--gain);
+}
+
+.controls {
+  align-content: start;
+}
+
+.controls label {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+input[type="number"],
+input[type="range"] {
+  width: 100%;
+}
+
+input[type="number"] {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font: inherit;
+  background: #fff;
+  color: var(--text);
+}
+
+input[type="range"] {
+  accent-color: var(--accent);
+}
+
+button {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover,
+button.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.preset-row {
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 18px;
+}
+
+.race-track,
+.milestone-panel {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.progress-bar {
+  height: 14px;
+  margin-top: 14px;
+  background: #eadfcf;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar div {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--gold), #f5d77a);
+}
+
+.chart-section svg {
+  width: 100%;
+  height: auto;
+  margin-top: 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,246,238,0.9));
+  border: 1px solid var(--border);
+}
+
+.chart-legend {
+  grid-template-columns: repeat(2, max-content);
+  margin-top: 12px;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 28px;
+  height: 4px;
+  margin-right: 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.balance-line {
+  background: var(--gain);
+}
+
+.invested-line {
+  background: var(--invested);
+}
+
+.badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.badge.locked {
+  opacity: 0.65;
+}
+
+.badge.unlocked {
+  border-color: rgba(195, 141, 47, 0.7);
+  background: linear-gradient(135deg, rgba(195, 141, 47, 0.14), rgba(255, 255, 255, 0.96));
+}
+
+.badge::after {
+  content: "";
+  position: absolute;
+  inset: auto -10% -20px auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(195, 141, 47, 0.12);
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .controls-and-summary,
+  .snapshot-grid,
+  .summary-grid,
+  .badge-grid,
+  .race-track,
+  .milestone-panel {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    max-width: none;
+  }
+}
