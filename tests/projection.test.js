@@ -2,6 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  describeAchievements,
+  findMilestoneHits,
+  getInvestorLevel,
   monthlyRateFromAnnual,
   nearestMilestoneProgress,
   projectInvestment
@@ -48,4 +51,42 @@ test("milestone progress is capped between zero and one", () => {
   assert.equal(state.nextMilestone, 250000);
   assert.ok(state.progress > 0);
   assert.ok(state.progress < 1);
+});
+
+test("milestone hits record the first month each target is reached", () => {
+  const projection = projectInvestment({
+    currentAge: 25,
+    targetAge: 35,
+    startingAmount: 5000,
+    monthlyContribution: 1200,
+    annualReturn: 0.1,
+    startDate: new Date("2026-01-01")
+  });
+
+  const hits = findMilestoneHits(projection.series);
+  assert.equal(hits[0].target, 10000);
+  assert.ok(hits[0].monthIndex > 0);
+  assert.ok(hits.some((hit) => hit.target === 100000));
+});
+
+test("investor level reflects the projected ending balance", () => {
+  assert.equal(getInvestorLevel(20000).label, "Seed Starter");
+  assert.equal(getInvestorLevel(125000).label, "Six-Figure Climber");
+  assert.equal(getInvestorLevel(2500000).label, "Freedom Engine");
+});
+
+test("achievements unlock when the projected path crosses key thresholds", () => {
+  const projection = projectInvestment({
+    currentAge: 25,
+    targetAge: 55,
+    startingAmount: 20000,
+    monthlyContribution: 1000,
+    annualReturn: 0.1,
+    startDate: new Date("2026-01-01")
+  });
+
+  const achievements = describeAchievements(projection);
+  assert.equal(achievements[0].title, "Habit Builder");
+  assert.equal(achievements[0].unlocked, true);
+  assert.ok(achievements.some((achievement) => achievement.title === "Six-Figure Club" && achievement.unlocked));
 });

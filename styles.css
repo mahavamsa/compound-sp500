@@ -1,14 +1,15 @@
 :root {
   color-scheme: light;
-  --bg: #f6f1e6;
-  --panel: rgba(255, 251, 245, 0.92);
+  --bg: #f5efe2;
+  --panel: rgba(255, 251, 246, 0.92);
   --panel-strong: #fffdf8;
-  --border: #d8ccb8;
-  --text: #2d2418;
-  --muted: #756450;
-  --accent: #1f7a4c;
-  --accent-soft: #dff2e6;
+  --border: #d8c9b4;
+  --text: #2c2318;
+  --muted: #766250;
+  --accent: #1e7a4a;
+  --accent-soft: #dff1e5;
   --gold: #c38d2f;
+  --gold-soft: #f7ecd0;
   --gain: #17824a;
   --invested: #3e6ea8;
   --danger: #b5523a;
@@ -25,8 +26,8 @@ body {
   color: var(--text);
   background:
     radial-gradient(circle at top left, rgba(195, 141, 47, 0.12), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(31, 122, 76, 0.12), transparent 28%),
-    var(--bg);
+    radial-gradient(circle at bottom right, rgba(31, 122, 76, 0.12), transparent 30%),
+    linear-gradient(180deg, #faf5eb 0%, #f5efe2 100%);
 }
 
 .app-shell {
@@ -40,19 +41,23 @@ body {
 .card {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 22px;
-  padding: 20px;
+  border-radius: 24px;
+  padding: 22px;
   box-shadow: 0 18px 36px rgba(45, 36, 24, 0.08);
   backdrop-filter: blur(12px);
 }
 
 .hero,
+.hero-side,
+.hero-chips,
 .controls-and-summary,
 .summary-grid,
 .snapshot-grid,
 .badge-grid,
 .preset-row,
 .chart-legend,
+.future-meta,
+.journey-grid,
 .race-track,
 .milestone-panel {
   display: grid;
@@ -60,18 +65,27 @@ body {
 }
 
 .hero {
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: 1.3fr 1fr;
   align-items: start;
 }
 
 .controls-and-summary {
-  grid-template-columns: minmax(280px, 360px) 1fr;
+  grid-template-columns: minmax(290px, 360px) 1fr;
+}
+
+.hero-side,
+.journey-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.journey-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .section-heading,
 .snapshot-header {
   display: flex;
-  align-items: end;
+  align-items: start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -91,58 +105,111 @@ p {
 }
 
 h1 {
-  font-size: clamp(2.2rem, 5vw, 4.4rem);
-  line-height: 0.96;
-  max-width: 9ch;
+  font-size: clamp(2.4rem, 5vw, 4.6rem);
+  line-height: 0.95;
+  max-width: 10ch;
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 1.55rem;
 }
 
 .hero-copy {
   margin-top: 14px;
-  max-width: 56ch;
+  max-width: 58ch;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
+.hero-chips {
+  grid-template-columns: repeat(3, max-content);
+  margin-top: 18px;
+}
+
+.hero-chips span,
+.level-pill {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.future-self,
+.market-snapshot,
+.journey-card {
+  background: var(--panel-strong);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.future-self {
+  background:
+    radial-gradient(circle at top right, rgba(195, 141, 47, 0.16), transparent 30%),
+    var(--panel-strong);
+}
+
+.future-self strong {
+  display: block;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  line-height: 1;
+}
+
+.future-copy,
+.level-copy,
+.journey-card p,
+.badge p,
+.chart-caption {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.future-copy {
+  margin-top: 10px;
+}
+
+.future-meta,
 .snapshot-grid,
 .summary-grid,
 .badge-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.future-meta div,
 .snapshot-grid article,
 .summary-grid article,
-.badge,
-.race-track,
-.milestone-panel {
-  background: var(--panel-strong);
+.badge {
+  background: rgba(255, 255, 255, 0.8);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 14px;
 }
 
+.future-meta span,
 .snapshot-grid span,
 .summary-grid span,
 .market-snapshot span,
-.race-track span,
+.race-copy span,
 .milestone-panel span,
 .controls label span,
 .badge small,
-.chart-legend {
+.chart-legend,
+.journey-card strong + p {
   color: var(--muted);
 }
 
+.future-meta strong,
 .snapshot-grid strong,
 .summary-grid strong,
-.race-track strong,
+.race-copy strong,
 .milestone-panel strong,
-.badge strong {
+.badge strong,
+.journey-card strong {
   display: block;
   margin-top: 6px;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
 }
 
 .market-snapshot strong.negative,
@@ -210,15 +277,58 @@ input:focus-visible {
   margin-top: 18px;
 }
 
-.race-track,
+.summary {
+  display: grid;
+  gap: 16px;
+}
+
+.level-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.level-pill strong {
+  color: var(--text);
+}
+
+.race-track {
+  grid-template-columns: minmax(160px, 220px) 1fr;
+  align-items: center;
+}
+
+.race-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.race-bar-shell {
+  height: 18px;
+  border-radius: 999px;
+  background: #e9dfcf;
+  overflow: hidden;
+}
+
+.race-bar {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+}
+
+.invested-bar {
+  background: linear-gradient(90deg, #6a98ce, var(--invested));
+}
+
+.gain-bar {
+  background: linear-gradient(90deg, #4bc273, var(--gain));
+}
+
 .milestone-panel {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 18px;
 }
 
 .progress-bar {
   height: 14px;
-  margin-top: 14px;
   background: #eadfcf;
   border-radius: 999px;
   overflow: hidden;
@@ -230,12 +340,20 @@ input:focus-visible {
   background: linear-gradient(90deg, var(--gold), #f5d77a);
 }
 
+.journey-card strong {
+  font-size: 1.65rem;
+}
+
+.chart-caption {
+  margin-top: -4px;
+}
+
 .chart-section svg {
   width: 100%;
   height: auto;
   margin-top: 16px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,246,238,0.9));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 246, 238, 0.94));
   border: 1px solid var(--border);
 }
 
@@ -261,38 +379,67 @@ input:focus-visible {
   background: var(--invested);
 }
 
+.badge-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .badge {
   position: relative;
   overflow: hidden;
 }
 
 .badge.locked {
-  opacity: 0.65;
+  opacity: 0.7;
 }
 
 .badge.unlocked {
-  border-color: rgba(195, 141, 47, 0.7);
-  background: linear-gradient(135deg, rgba(195, 141, 47, 0.14), rgba(255, 255, 255, 0.96));
+  border-color: rgba(195, 141, 47, 0.75);
+  background: linear-gradient(135deg, rgba(195, 141, 47, 0.16), rgba(255, 255, 255, 0.96));
+}
+
+.badge-target {
+  font-weight: 600;
+  color: var(--text);
 }
 
 .badge::after {
   content: "";
   position: absolute;
-  inset: auto -10% -20px auto;
-  width: 72px;
-  height: 72px;
+  inset: auto -10% -24px auto;
+  width: 78px;
+  height: 78px;
   border-radius: 50%;
   background: rgba(195, 141, 47, 0.12);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 980px) {
   .hero,
   .controls-and-summary,
+  .journey-grid,
+  .badge-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-side {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-chips {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
   .snapshot-grid,
   .summary-grid,
-  .badge-grid,
-  .race-track,
-  .milestone-panel {
+  .future-meta,
+  .milestone-panel,
+  .race-track {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-legend,
+  .preset-row {
     grid-template-columns: 1fr;
   }
 

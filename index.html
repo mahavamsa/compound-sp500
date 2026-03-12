@@ -3,42 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Compound S&P 500</title>
+    <title>Compound S&amp;P 500</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="app-shell">
       <section class="hero card">
-        <div>
+        <div class="hero-copy-block">
           <p class="eyebrow">Investing Simulator</p>
-          <h1>Watch compounding take over.</h1>
+          <h1>See what your future self can own.</h1>
           <p class="hero-copy">
-            Explore how a lump sum and monthly S&amp;P 500 investing habit can grow over time.
+            Explore how a starting amount plus steady S&amp;P 500 investing can grow month by month.
             The market snapshot is live. The projection is an educational simulation, not financial advice.
           </p>
-        </div>
-        <div class="market-snapshot" aria-live="polite">
-          <div class="snapshot-header">
-            <span>Current S&amp;P 500 snapshot</span>
-            <strong id="snapshot-status">Loading...</strong>
+          <div class="hero-chips">
+            <span id="investing-horizon">--</span>
+            <span id="deposit-count">--</span>
+            <span>Live snapshot + adjustable return</span>
           </div>
-          <div class="snapshot-grid">
-            <article>
-              <span>Index level</span>
-              <strong id="index-level">--</strong>
-            </article>
-            <article>
-              <span>YTD return</span>
-              <strong id="ytd-return">--</strong>
-            </article>
-            <article>
-              <span>Last close</span>
-              <strong id="last-close-date">--</strong>
-            </article>
-            <article>
-              <span>Default annual return</span>
-              <strong>10.0%</strong>
-            </article>
+        </div>
+
+        <div class="hero-side">
+          <div class="market-snapshot" aria-live="polite">
+            <div class="snapshot-header">
+              <span>Current S&amp;P 500 snapshot</span>
+              <strong id="snapshot-status">Loading...</strong>
+            </div>
+            <div class="snapshot-grid">
+              <article>
+                <span>Index level</span>
+                <strong id="index-level">--</strong>
+              </article>
+              <article>
+                <span>YTD return</span>
+                <strong id="ytd-return">--</strong>
+              </article>
+              <article>
+                <span>Last close</span>
+                <strong id="last-close-date">--</strong>
+              </article>
+              <article>
+                <span>Default annual return</span>
+                <strong>10.0%</strong>
+              </article>
+            </div>
+          </div>
+
+          <div class="future-self">
+            <p class="eyebrow">Future self</p>
+            <strong id="projected-balance">--</strong>
+            <p class="future-copy" id="future-self-copy">Projected value at your target age.</p>
+            <div class="future-meta">
+              <div>
+                <span>Target age</span>
+                <strong id="future-age">--</strong>
+              </div>
+              <div>
+                <span>Investor level</span>
+                <strong id="investor-level">--</strong>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -46,8 +70,10 @@
       <section class="controls-and-summary">
         <form class="card controls" id="projection-form">
           <div class="section-heading">
-            <p class="eyebrow">Your plan</p>
-            <h2>Set your investing path</h2>
+            <div>
+              <p class="eyebrow">Your plan</p>
+              <h2>Shape the simulation</h2>
+            </div>
           </div>
 
           <label>
@@ -85,15 +111,19 @@
 
         <section class="card summary">
           <div class="section-heading">
-            <p class="eyebrow">Projection</p>
-            <h2>Your future value</h2>
+            <div>
+              <p class="eyebrow">Projection</p>
+              <h2>Compounding dashboard</h2>
+            </div>
+            <div class="level-pill">
+              <span>Level</span>
+              <strong id="level-pill">--</strong>
+            </div>
           </div>
 
+          <p class="level-copy" id="level-copy">--</p>
+
           <div class="summary-grid">
-            <article>
-              <span>Projected balance</span>
-              <strong id="projected-balance">--</strong>
-            </article>
             <article>
               <span>Total invested</span>
               <strong id="total-invested">--</strong>
@@ -106,27 +136,40 @@
               <span>Compounding share</span>
               <strong id="compounding-share">--</strong>
             </article>
+            <article>
+              <span>Next milestone</span>
+              <strong id="next-milestone">--</strong>
+            </article>
           </div>
 
           <div class="race-track">
-            <div>
+            <div class="race-copy">
               <span>You contributed</span>
               <strong id="contribution-race">--</strong>
             </div>
-            <div>
+            <div class="race-bar-shell">
+              <div class="race-bar invested-bar" id="invested-bar"></div>
+            </div>
+          </div>
+
+          <div class="race-track">
+            <div class="race-copy">
               <span>Compounding created</span>
               <strong id="gain-race">--</strong>
+            </div>
+            <div class="race-bar-shell">
+              <div class="race-bar gain-bar" id="gain-bar"></div>
             </div>
           </div>
 
           <div class="milestone-panel">
             <div>
-              <span>Next milestone</span>
-              <strong id="next-milestone">--</strong>
+              <span>Progress to next target</span>
+              <strong id="milestone-progress-label">--</strong>
             </div>
             <div>
-              <span>Progress</span>
-              <strong id="milestone-progress-label">--</strong>
+              <span>Estimated unlock timing</span>
+              <strong id="next-milestone-date">--</strong>
             </div>
           </div>
           <div class="progress-bar" aria-hidden="true">
@@ -135,11 +178,16 @@
         </section>
       </section>
 
+      <section class="journey-grid" id="journey-highlights" aria-label="Journey highlights"></section>
+
       <section class="card chart-section">
         <div class="section-heading">
-          <p class="eyebrow">Monthly journey</p>
-          <h2>Month-by-month growth</h2>
+          <div>
+            <p class="eyebrow">Monthly journey</p>
+            <h2>Watch invested dollars and compounding diverge</h2>
+          </div>
         </div>
+        <p class="chart-caption" id="chart-caption">--</p>
         <svg id="projection-chart" viewBox="0 0 900 360" role="img" aria-label="Projection chart"></svg>
         <div class="chart-legend">
           <span><i class="legend-line balance-line"></i>Portfolio value</span>
@@ -149,8 +197,10 @@
 
       <section class="card milestones-section">
         <div class="section-heading">
-          <p class="eyebrow">Game mode</p>
-          <h2>Unlock wealth milestones</h2>
+          <div>
+            <p class="eyebrow">Game mode</p>
+            <h2>Unlock compounding achievements</h2>
+          </div>
         </div>
         <div class="badge-grid" id="badge-grid"></div>
       </section>
