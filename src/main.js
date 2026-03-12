@@ -1,19 +1,27 @@
 import {
-  DEFAULT_ANNUAL_RETURN,
+  MILESTONES,
   buildJourneyHighlights,
   describeAchievements,
-  formatCurrency,
-  formatDuration,
-  formatPercent,
-  nearestMilestoneProgress,
   projectInvestment
 } from "./projection.js";
+import {
+  DEFAULT_LOCALE,
+  detectLocale,
+  formatCurrency,
+  formatDate,
+  formatDuration,
+  formatNumber,
+  formatPercent,
+  getLocaleConfig,
+  getPreferredLocale,
+  setPreferredLocale
+} from "./i18n.js";
 
 const FALLBACK_MARKET = {
   indexLevel: 6775.8,
   ytdReturn: -0.0099,
   lastCloseDate: "2026-03-11",
-  source: "Fallback snapshot"
+  sourceKey: "fallback"
 };
 
 const presets = {
@@ -52,20 +60,43 @@ const journeyHighlightsNode = document.querySelector("#journey-highlights");
 const badgeGrid = document.querySelector("#badge-grid");
 const chart = document.querySelector("#projection-chart");
 const chartCaptionNode = document.querySelector("#chart-caption");
+const localeButtons = document.querySelectorAll("[data-locale-switch]");
+const translatableNodes = document.querySelectorAll("[data-i18n]");
 
+let currentLocale = DEFAULT_LOCALE;
 let marketSnapshot = FALLBACK_MARKET;
 
+function applyStaticTranslations() {
+  const strings = getLocaleConfig(currentLocale).static;
+
+  document.documentElement.lang = currentLocale;
+  document.title = strings.pageTitle;
+
+  translatableNodes.forEach((node) => {
+    const key = node.dataset.i18n;
+    node.textContent = strings[key];
+  });
+
+  localeButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.localeSwitch === currentLocale);
+  });
+}
+
 function renderSnapshot(snapshot) {
-  indexLevelNode.textContent = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(snapshot.indexLevel);
-  ytdReturnNode.textContent = formatPercent(snapshot.ytdReturn);
+  const locale = getLocaleConfig(currentLocale);
+  indexLevelNode.textContent = formatNumber(snapshot.indexLevel, currentLocale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  ytdReturnNode.textContent = formatPercent(snapshot.ytdReturn, currentLocale);
   ytdReturnNode.classList.toggle("positive", snapshot.ytdReturn >= 0);
   ytdReturnNode.classList.toggle("negative", snapshot.ytdReturn < 0);
-  lastCloseDateNode.textContent = new Date(snapshot.lastCloseDate).toLocaleDateString("en-US", {
+  lastCloseDateNode.textContent = formatDate(snapshot.lastCloseDate, currentLocale, {
     year: "numeric",
     month: "short",
     day: "numeric"
   });
-  snapshotStatus.textContent = snapshot.source;
+  snapshotStatus.textContent = locale.sourceLabels[snapshot.sourceKey] ?? locale.sourceLabels.fallback;
 }
 
 async function loadMarketSnapshot() {
@@ -89,13 +120,15 @@ function readInputs() {
     targetAge: Number(form.targetAge.value),
     startingAmount: Number(form.startingAmount.value),
     monthlyContribution: Number(form.monthlyContribution.value),
-    annualReturn: Number(form.annualReturn.value) / 100 || DEFAULT_ANNUAL_RETURN
+    annualReturn: Number(form.annualReturn.value) / 100,
+    locale: currentLocale
   };
 }
 
 function renderProjection() {
   const inputs = readInputs();
-  annualReturnValue.textContent = `${(inputs.annualReturn * 100).toFixed(1)}%`;
+  const locale = getLocaleConfig(currentLocale);
+  annualReturnValue.textContent = formatPercent(inputs.annualReturn || 0, currentLocale);
 
   let projection;
   try {
@@ -106,32 +139,43 @@ function renderProjection() {
   }
 
   const { finalPoint, compoundingShare, totalMonths, totalGain, totalInvested, investorLevel } = projection;
-  const milestoneState = nearestMilestoneProgress(finalPoint.balance);
+  const milestoneState = projection.nextMilestone
+    ? {
+        nextMilestone: projection.nextMilestone,
+        progress: clampProgress(finalPoint.balance, projection.nextMilestone)
+      }
+    : { nextMilestone: null, progress: 1 };
   const maxRaceValue = Math.max(totalInvested, totalGain, 1);
   const investedWidth = Math.max(10, Math.round((totalInvested / maxRaceValue) * 100));
   const gainWidth = Math.max(10, Math.round((Math.max(totalGain, 0) / maxRaceValue) * 100));
   const nextMilestoneHit = projection.milestoneHits.find((hit) => hit.target === milestoneState.nextMilestone) ?? null;
 
-  projectedBalanceNode.textContent = formatCurrency(finalPoint.balance);
-  totalInvestedNode.textContent = formatCurrency(totalInvested);
-  totalGainNode.textContent = formatCurrency(totalGain);
+  projectedBalanceNode.textContent = formatCurrency(finalPoint.balance, currentLocale);
+  totalInvestedNode.textContent = formatCurrency(totalInvested, currentLocale);
+  totalGainNode.textContent = formatCurrency(totalGain, currentLocale);
   totalGainNode.classList.toggle("positive", totalGain >= 0);
   totalGainNode.classList.toggle("negative", totalGain < 0);
-  compoundingShareNode.textContent = formatPercent(compoundingShare);
-  contributionRaceNode.textContent = formatCurrency(totalInvested);
-  gainRaceNode.textContent = formatCurrency(totalGain);
-  nextMilestoneNode.textContent = milestoneState.nextMilestone ? formatCurrency(milestoneState.nextMilestone) : "All milestones cleared";
-  milestoneProgressLabelNode.textContent = `${Math.round(milestoneState.progress * 100)}%`;
+  compoundingShareNode.textContent = formatPercent(compoundingShare, currentLocale);
+  contributionRaceNode.textContent = formatCurrency(totalInvested, currentLocale);
+  gainRaceNode.textContent = formatCurrency(totalGain, currentLocale);
+  nextMilestoneNode.textContent = milestoneState.nextMilestone
+    ? formatCurrency(milestoneState.nextMilestone, currentLocale)
+    : locale.labels.allMilestonesCleared;
+  milestoneProgressLabelNode.textContent = formatPercent(milestoneState.progress, currentLocale);
   milestoneProgressBar.style.width = `${Math.round(milestoneState.progress * 100)}%`;
   nextMilestoneDateNode.textContent = nextMilestoneHit
-    ? nextMilestoneHit.date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    ? formatDate(nextMilestoneHit.date, currentLocale, { month: "short", year: "numeric" })
     : milestoneState.nextMilestone
-      ? "Beyond current plan"
-      : "Already achieved";
-  futureAgeNode.textContent = `Age ${inputs.targetAge}`;
-  futureSelfCopyNode.textContent = `At age ${inputs.targetAge}, this plan projects ${formatCurrency(finalPoint.balance)} with ${formatCurrency(totalGain)} from growth.`;
-  investingHorizonNode.textContent = formatDuration(totalMonths);
-  depositCountNode.textContent = `${totalMonths} monthly deposits`;
+      ? locale.labels.beyondCurrentPlan
+      : locale.labels.alreadyAchieved;
+  futureAgeNode.textContent = `${locale.labels.agePrefix} ${inputs.targetAge}`;
+  futureSelfCopyNode.textContent = locale.templates.futureSelfCopy(
+    inputs.targetAge,
+    formatCurrency(finalPoint.balance, currentLocale),
+    formatCurrency(totalGain, currentLocale)
+  );
+  investingHorizonNode.textContent = formatDuration(totalMonths, currentLocale);
+  depositCountNode.textContent = locale.templates.depositCount(totalMonths);
   investorLevelNode.textContent = investorLevel.label;
   levelPillNode.textContent = investorLevel.label;
   levelCopyNode.textContent = investorLevel.copy;
@@ -141,22 +185,27 @@ function renderProjection() {
   renderJourneyHighlights(projection);
   renderBadges(projection);
   renderChart(projection.series);
-  chartCaptionNode.textContent = `Starting with ${formatCurrency(inputs.startingAmount)} and adding ${formatCurrency(inputs.monthlyContribution)} per month over ${formatDuration(totalMonths)}.`;
+  chartCaptionNode.textContent = locale.templates.chartCaption(
+    formatCurrency(inputs.startingAmount, currentLocale),
+    formatCurrency(inputs.monthlyContribution, currentLocale),
+    formatDuration(totalMonths, currentLocale)
+  );
 }
 
 function renderErrorState(message) {
+  const locale = getLocaleConfig(currentLocale);
   projectedBalanceNode.textContent = message;
   totalInvestedNode.textContent = "--";
   totalGainNode.textContent = "--";
   compoundingShareNode.textContent = "--";
   contributionRaceNode.textContent = "--";
   gainRaceNode.textContent = "--";
-  nextMilestoneNode.textContent = "Adjust ages";
-  milestoneProgressLabelNode.textContent = "0%";
+  nextMilestoneNode.textContent = locale.labels.adjustAges;
+  milestoneProgressLabelNode.textContent = formatPercent(0, currentLocale);
   nextMilestoneDateNode.textContent = "--";
   milestoneProgressBar.style.width = "0%";
   futureAgeNode.textContent = "--";
-  futureSelfCopyNode.textContent = "Projected value at your target age.";
+  futureSelfCopyNode.textContent = locale.labels.projectedValueAtTargetAge;
   investingHorizonNode.textContent = "--";
   depositCountNode.textContent = "--";
   investorLevelNode.textContent = "--";
@@ -173,7 +222,7 @@ function renderErrorState(message) {
 function renderJourneyHighlights(projection) {
   journeyHighlightsNode.innerHTML = "";
 
-  buildJourneyHighlights(projection).forEach((item) => {
+  buildJourneyHighlights(projection, currentLocale).forEach((item) => {
     const article = document.createElement("article");
     article.className = "card journey-card";
     article.innerHTML = `
@@ -186,13 +235,14 @@ function renderJourneyHighlights(projection) {
 }
 
 function renderBadges(projection) {
+  const locale = getLocaleConfig(currentLocale);
   badgeGrid.innerHTML = "";
 
-  describeAchievements(projection).forEach((achievement) => {
+  describeAchievements(projection, currentLocale).forEach((achievement) => {
     const article = document.createElement("article");
     article.className = `badge ${achievement.unlocked ? "unlocked" : "locked"}`;
     article.innerHTML = `
-      <small>${achievement.unlocked ? "Unlocked" : "Locked"}</small>
+      <small>${achievement.unlocked ? locale.achievements.unlocked : locale.achievements.locked}</small>
       <strong>${achievement.title}</strong>
       <p class="badge-target">${achievement.target}</p>
       <p>${achievement.detail}</p>
@@ -202,6 +252,7 @@ function renderBadges(projection) {
 }
 
 function renderChart(series) {
+  const locale = getLocaleConfig(currentLocale);
   const width = 900;
   const height = 360;
   const padding = { top: 24, right: 24, bottom: 38, left: 68 };
@@ -224,7 +275,7 @@ function renderChart(series) {
       .map(
         (value) => `
           <line x1="${padding.left}" y1="${y(value)}" x2="${width - padding.right}" y2="${y(value)}" stroke="#e4d9c9" stroke-dasharray="4 8" />
-          <text x="${padding.left - 10}" y="${y(value) + 4}" fill="#756450" font-size="12" text-anchor="end">${formatCurrency(value)}</text>
+          <text x="${padding.left - 10}" y="${y(value) + 4}" fill="#756450" font-size="12" text-anchor="end">${formatCurrency(value, currentLocale)}</text>
         `
       )
       .join("")}
@@ -234,9 +285,9 @@ function renderChart(series) {
     <path d="${balancePath}" fill="none" stroke="#17824a" stroke-width="5" stroke-linecap="round" />
     <circle cx="${x(endLabel.monthIndex)}" cy="${y(endLabel.balance)}" r="6" fill="#17824a" />
     <circle cx="${x(endLabel.monthIndex)}" cy="${y(endLabel.invested)}" r="5" fill="#3e6ea8" />
-    <text x="${padding.left}" y="${height - 12}" fill="#756450" font-size="12">Start</text>
-    <text x="${x(middleLabel.monthIndex)}" y="${height - 12}" fill="#756450" font-size="12" text-anchor="middle">${middleLabel.date.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</text>
-    <text x="${x(endLabel.monthIndex)}" y="${height - 12}" fill="#756450" font-size="12" text-anchor="end">${endLabel.date.toLocaleDateString("en-US", { month: "short", year: "numeric" })}</text>
+    <text x="${padding.left}" y="${height - 12}" fill="#756450" font-size="12">${locale.labels.start}</text>
+    <text x="${x(middleLabel.monthIndex)}" y="${height - 12}" fill="#756450" font-size="12" text-anchor="middle">${formatDate(middleLabel.date, currentLocale, { month: "short", year: "numeric" })}</text>
+    <text x="${x(endLabel.monthIndex)}" y="${height - 12}" fill="#756450" font-size="12" text-anchor="end">${formatDate(endLabel.date, currentLocale, { month: "short", year: "numeric" })}</text>
   `;
 }
 
@@ -263,12 +314,39 @@ function applyPreset(name) {
   renderProjection();
 }
 
+function setLocale(locale, persist = true) {
+  currentLocale = detectLocale(locale);
+  if (persist) {
+    setPreferredLocale(currentLocale);
+  }
+  applyStaticTranslations();
+  renderSnapshot(marketSnapshot);
+  renderProjection();
+}
+
+function clampProgress(balance, nextMilestone) {
+  if (!nextMilestone) {
+    return 1;
+  }
+  const previousMilestone = [...MILESTONES].reverse().find((target) => target <= balance) ?? 0;
+  const span = nextMilestone - previousMilestone;
+  return span === 0 ? 1 : Math.min(1, Math.max(0, (balance - previousMilestone) / span));
+}
+
 form.addEventListener("input", renderProjection);
 document.querySelectorAll("[data-preset]").forEach((button) => {
   button.addEventListener("click", () => applyPreset(button.dataset.preset));
 });
 
+localeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setLocale(button.dataset.localeSwitch);
+  });
+});
+
 annualReturnInput.addEventListener("input", renderProjection);
 
+currentLocale = getPreferredLocale();
+applyStaticTranslations();
 applyPreset("steady");
 loadMarketSnapshot();

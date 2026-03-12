@@ -24,7 +24,7 @@ export default async function handler(_request, response) {
       indexLevel: 6775.8,
       ytdReturn: -0.0099,
       lastCloseDate: "2026-03-11",
-      source: "Fallback snapshot"
+      sourceKey: "fallback"
     });
   }
 }
@@ -41,7 +41,7 @@ export function buildSnapshot(quoteCsv, historyCsv) {
     indexLevel,
     ytdReturn,
     lastCloseDate,
-    source: "Live via Stooq"
+    sourceKey: "liveStooq"
   };
 }
 

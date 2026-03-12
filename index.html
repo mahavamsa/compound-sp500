@@ -10,56 +10,63 @@
     <main class="app-shell">
       <section class="hero card hero-card">
         <div class="hero-copy-block">
-          <p class="eyebrow">Investing Simulator</p>
-          <h1>See what your future self can own.</h1>
-          <p class="hero-copy">
+          <div class="hero-toolbar">
+            <p class="eyebrow" data-i18n="heroEyebrow">Investing Simulator</p>
+            <div class="lang-switcher" aria-label="Language switcher">
+              <span data-i18n="languageLabel">Language</span>
+              <button type="button" class="lang-button" data-locale-switch="en">EN</button>
+              <button type="button" class="lang-button" data-locale-switch="id">ID</button>
+            </div>
+          </div>
+          <h1 data-i18n="heroTitle">See what your future self can own.</h1>
+          <p class="hero-copy" data-i18n="heroCopy">
             Explore how a starting amount plus steady S&amp;P 500 investing can grow month by month.
             The market snapshot is live. The projection is an educational simulation, not financial advice.
           </p>
           <div class="hero-chips">
             <span id="investing-horizon">--</span>
             <span id="deposit-count">--</span>
-            <span>Live snapshot + adjustable return</span>
+            <span data-i18n="heroChipLive">Live snapshot + adjustable return</span>
           </div>
         </div>
 
         <div class="hero-side">
           <div class="market-snapshot market-card" aria-live="polite">
             <div class="snapshot-header">
-              <span>Current S&amp;P 500 snapshot</span>
+              <span data-i18n="marketSnapshot">Current S&amp;P 500 snapshot</span>
               <strong id="snapshot-status">Loading...</strong>
             </div>
             <div class="snapshot-grid">
               <article>
-                <span>Index level</span>
+                <span data-i18n="indexLevel">Index level</span>
                 <strong id="index-level">--</strong>
               </article>
               <article>
-                <span>YTD return</span>
+                <span data-i18n="ytdReturn">YTD return</span>
                 <strong id="ytd-return">--</strong>
               </article>
               <article>
-                <span>Last close</span>
+                <span data-i18n="lastClose">Last close</span>
                 <strong id="last-close-date">--</strong>
               </article>
               <article>
-                <span>Default annual return</span>
+                <span data-i18n="defaultAnnualReturn">Default annual return</span>
                 <strong>10.0%</strong>
               </article>
             </div>
           </div>
 
           <div class="future-self future-card">
-            <p class="eyebrow">Future self</p>
+            <p class="eyebrow" data-i18n="futureSelf">Future self</p>
             <strong id="projected-balance">--</strong>
             <p class="future-copy" id="future-self-copy">Projected value at your target age.</p>
             <div class="future-meta">
               <div>
-                <span>Target age</span>
+                <span data-i18n="targetAge">Target age</span>
                 <strong id="future-age">--</strong>
               </div>
               <div>
-                <span>Investor level</span>
+                <span data-i18n="investorLevel">Investor level</span>
                 <strong id="investor-level">--</strong>
               </div>
             </div>
@@ -71,52 +78,52 @@
         <form class="card controls controls-card" id="projection-form">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Your plan</p>
-              <h2>Shape the simulation</h2>
+              <p class="eyebrow" data-i18n="yourPlan">Your plan</p>
+              <h2 data-i18n="shapeSimulation">Shape the simulation</h2>
             </div>
           </div>
 
           <label>
-            <span>Current age</span>
+            <span data-i18n="currentAge">Current age</span>
             <input id="current-age" name="currentAge" type="number" min="18" max="80" value="30" />
           </label>
 
           <label>
-            <span>Invest until age</span>
+            <span data-i18n="investUntilAge">Invest until age</span>
             <input id="target-age" name="targetAge" type="number" min="19" max="90" value="60" />
           </label>
 
           <label>
-            <span>Starting amount</span>
+            <span data-i18n="startingAmount">Starting amount</span>
             <input id="starting-amount" name="startingAmount" type="number" min="0" step="100" value="10000" />
           </label>
 
           <label>
-            <span>Monthly DCA</span>
+            <span data-i18n="monthlyDca">Monthly DCA</span>
             <input id="monthly-contribution" name="monthlyContribution" type="number" min="0" step="50" value="500" />
           </label>
 
           <label>
-            <span>Expected annual return</span>
+            <span data-i18n="expectedAnnualReturn">Expected annual return</span>
             <input id="annual-return" name="annualReturn" type="range" min="4" max="12" step="0.5" value="10" />
             <strong id="annual-return-value">10.0%</strong>
           </label>
 
           <div class="preset-row" aria-label="Quick presets">
-            <button type="button" data-preset="starter">Starter</button>
-            <button type="button" data-preset="steady">Steady</button>
-            <button type="button" data-preset="stretch">Stretch</button>
+            <button type="button" data-preset="starter" data-i18n="starter">Starter</button>
+            <button type="button" data-preset="steady" data-i18n="steady">Steady</button>
+            <button type="button" data-preset="stretch" data-i18n="stretch">Stretch</button>
           </div>
         </form>
 
         <section class="card summary summary-card">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">Projection</p>
-              <h2>Compounding dashboard</h2>
+              <p class="eyebrow" data-i18n="projection">Projection</p>
+              <h2 data-i18n="compoundingDashboard">Compounding dashboard</h2>
             </div>
             <div class="level-pill">
-              <span>Level</span>
+              <span data-i18n="level">Level</span>
               <strong id="level-pill">--</strong>
             </div>
           </div>
@@ -125,26 +132,26 @@
 
           <div class="summary-grid">
             <article>
-              <span>Total invested</span>
+              <span data-i18n="totalInvested">Total invested</span>
               <strong id="total-invested">--</strong>
             </article>
             <article>
-              <span>Total gain</span>
+              <span data-i18n="totalGain">Total gain</span>
               <strong id="total-gain">--</strong>
             </article>
             <article>
-              <span>Compounding share</span>
+              <span data-i18n="compoundingShare">Compounding share</span>
               <strong id="compounding-share">--</strong>
             </article>
             <article>
-              <span>Next milestone</span>
+              <span data-i18n="nextMilestone">Next milestone</span>
               <strong id="next-milestone">--</strong>
             </article>
           </div>
 
           <div class="race-track">
             <div class="race-copy">
-              <span>You contributed</span>
+              <span data-i18n="youContributed">You contributed</span>
               <strong id="contribution-race">--</strong>
             </div>
             <div class="race-bar-shell">
@@ -154,7 +161,7 @@
 
           <div class="race-track">
             <div class="race-copy">
-              <span>Compounding created</span>
+              <span data-i18n="compoundingCreated">Compounding created</span>
               <strong id="gain-race">--</strong>
             </div>
             <div class="race-bar-shell">
@@ -164,11 +171,11 @@
 
           <div class="milestone-panel">
             <div>
-              <span>Progress to next target</span>
+              <span data-i18n="progressToNextTarget">Progress to next target</span>
               <strong id="milestone-progress-label">--</strong>
             </div>
             <div>
-              <span>Estimated unlock timing</span>
+              <span data-i18n="estimatedUnlockTiming">Estimated unlock timing</span>
               <strong id="next-milestone-date">--</strong>
             </div>
           </div>
@@ -183,23 +190,23 @@
       <section class="card chart-section chart-card">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Monthly journey</p>
-            <h2>Watch invested dollars and compounding diverge</h2>
+            <p class="eyebrow" data-i18n="monthlyJourney">Monthly journey</p>
+            <h2 data-i18n="chartTitle">Watch invested dollars and compounding diverge</h2>
           </div>
         </div>
         <p class="chart-caption" id="chart-caption">--</p>
         <svg id="projection-chart" viewBox="0 0 900 360" role="img" aria-label="Projection chart"></svg>
         <div class="chart-legend">
-          <span><i class="legend-line balance-line"></i>Portfolio value</span>
-          <span><i class="legend-line invested-line"></i>Total invested</span>
+          <span><i class="legend-line balance-line"></i><span data-i18n="portfolioValue">Portfolio value</span></span>
+          <span><i class="legend-line invested-line"></i><span data-i18n="totalInvested">Total invested</span></span>
         </div>
       </section>
 
       <section class="card milestones-section achievements-card">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Game mode</p>
-            <h2>Unlock compounding achievements</h2>
+            <p class="eyebrow" data-i18n="gameMode">Game mode</p>
+            <h2 data-i18n="achievementsTitle">Unlock compounding achievements</h2>
           </div>
         </div>
         <div class="badge-grid" id="badge-grid"></div>
